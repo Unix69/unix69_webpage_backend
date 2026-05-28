@@ -43,6 +43,8 @@ router.get("/", async (req, res) => {
         100
       );
 
+      console.log("RAW REDIS SCAN:", reply);
+
       const nextCursor = Array.isArray(reply) ? reply[0] : "0";
       const scannedKeys = Array.isArray(reply) ? reply[1] : [];
 
