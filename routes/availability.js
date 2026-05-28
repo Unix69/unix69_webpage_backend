@@ -35,18 +35,29 @@ router.get("/", async (req, res) => {
     let keys = [];
 
     do {
-      const reply = await redis.scan(
-        cursor,
-        "MATCH",
-        "lock:cal-slot:*",
-        "COUNT",
-        100
-      );
+      let reply;
 
-      console.log("RAW REDIS SCAN:", reply);
+      try {
+        reply = await redis.scan(
+          cursor,
+          "MATCH",
+          "lock:cal-slot:*",
+          "COUNT",
+          100
+        );
 
-      const nextCursor = Array.isArray(reply) ? reply[0] : "0";
-      const scannedKeys = Array.isArray(reply) ? reply[1] : [];
+        console.log("RAW REDIS SCAN:", reply);
+
+      } catch (e) {
+        console.error("REDIS SCAN FAILED:", e);
+        throw e;
+      }
+
+      const nextCursor =
+        Array.isArray(reply) ? reply[0] : reply?.cursor ?? "0";
+
+      const scannedKeys =
+        Array.isArray(reply) ? reply[1] : reply?.keys ?? [];
 
       cursor = nextCursor;
       keys.push(...scannedKeys);
