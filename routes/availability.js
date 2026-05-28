@@ -13,15 +13,16 @@ router.get("/", async (req, res) => {
     }
 
     const { data } = await axios.get(
-      "https://api.cal.com/v1/slots",
+      "https://api.cal.com/v2/slots/available",
       {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
+          "cal-api-version": "2024-09-04",
         },
         params: {
           eventTypeId: process.env.CAL_EVENT_TYPE_ID,
-          startTime: new Date().toISOString(),
-          endTime: new Date(Date.now() + 7 * 86400000).toISOString(),
+          start: new Date().toISOString(),
+          end: new Date(Date.now() + 7 * 86400000).toISOString(),
         },
       }
     );
@@ -54,7 +55,7 @@ router.get("/", async (req, res) => {
     const filtered = {
       ...data,
       slots: slots.filter(slot => {
-        return !lockedSlots.has(slot.startTime);
+        return !lockedSlots.has(slot.start);
       }),
     };
 
