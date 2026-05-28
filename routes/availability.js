@@ -62,9 +62,14 @@ router.get("/", async (req, res) => {
     return res.status(200).json(filtered);
 
   } catch (err) {
+    console.error("🔥 AVAILABILITY ERROR FULL:");
+    console.error("STATUS:", err?.response?.status);
+    console.error("DATA:", err?.response?.data);
+    console.error("MESSAGE:", err.message);
+
     return res.status(500).json({
       error: "Failed to fetch availability",
-      details: err.message,
+      details: err?.response?.data || err.message,
     });
   }
 });
