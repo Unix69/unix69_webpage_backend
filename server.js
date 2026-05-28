@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 
-import reserveSlot from "./routes/reserveSlot.js";
+import reserveSlot from "./routes/reserve-slots.js";
 import book from "./routes/book.js";
 import availability from "./routes/availability.js";
 
