@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
     let keys = [];
 
     do {
-      const reply = await redis.scan(
+      const [nextCursor, scannedKeys] = await redis.scan(
         cursor,
         "MATCH",
         "lock:cal-slot:*",
@@ -43,10 +43,12 @@ router.get("/", async (req, res) => {
         100
       );
 
-      cursor = reply[0];
-      keys.push(...reply[1]);
+      cursor = nextCursor;
+      keys.push(...(scannedKeys || []));
 
     } while (cursor !== "0");
+
+console.log("Redis locks:", keys.length);
 
     const lockedSlots = new Set(
       keys.map(k => k.replace("lock:cal-slot:", ""))
