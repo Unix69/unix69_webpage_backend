@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
     }
 
     const { data } = await axios.get(
-      "https://api.cal.com/v2/slots/available",
+      "https://api.cal.com/v2/slots",
       {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
