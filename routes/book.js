@@ -77,7 +77,7 @@ router.post("/", async (req, res) => {
     */
 
     const { data } = await axios.post(
-      "https://api.cal.com/v1/bookings",
+      "https://api.cal.com/v2/bookings",
       {
         eventTypeId: process.env.CAL_EVENT_TYPE_ID,
         start,
