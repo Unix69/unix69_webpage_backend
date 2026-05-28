@@ -1,6 +1,6 @@
 import axios from "axios";
 import express from "express";
-import { redis } from "../lib/redis.js";
+import redis  from "../lib/redis.js";
 
 const router = express.Router();
 

@@ -2,7 +2,7 @@ import express from "express";
 import axios from "axios";
 
 import { releaseLock } from "../lib/lock.js";
-import { redis } from "../lib/redis.js";
+import redis  from "../lib/redis.js";
 
 const router = express.Router();
 
