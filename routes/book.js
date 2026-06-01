@@ -86,11 +86,9 @@ router.post("/", async (req, res) => {
 
     console.log("CAL PAYLOAD:", payload);
 
-    const { data } = await axios.post(
+    const response = await axios.post(
       "https://api.cal.com/v2/bookings",
-      {
-        data: payload
-      },
+      payload,
       {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
@@ -99,6 +97,8 @@ router.post("/", async (req, res) => {
         timeout: 10000,
       }
     );
+
+const data = response.data;
 
     /*
     =========================================
@@ -123,13 +123,14 @@ router.post("/", async (req, res) => {
     });
 
   } finally {
-    /*
-    =========================================
-    5. SAFE LOCK RELEASE
-    =========================================
-    */
-    await releaseLock(lockKey, lockToken);
-  }
+      try {
+        if (lockKey && lockToken) {
+          await releaseLock(lockKey, lockToken);
+        }
+      } catch (err) {
+        console.error("LOCK RELEASE ERROR:", err.message);
+      }
+    }
 });
 
 export default router;
