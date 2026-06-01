@@ -88,7 +88,9 @@ router.post("/", async (req, res) => {
 
     const { data } = await axios.post(
       "https://api.cal.com/v2/bookings",
-      payload,
+      {
+        data: payload
+      },
       {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
