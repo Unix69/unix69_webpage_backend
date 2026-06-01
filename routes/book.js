@@ -1,8 +1,7 @@
 import express from "express";
 import axios from "axios";
-
 import { releaseLock } from "../lib/lock.js";
-import redis  from "../lib/redis.js";
+import redis from "../lib/redis.js";
 
 const router = express.Router();
 
@@ -19,19 +18,10 @@ router.post("/", async (req, res) => {
 
   /*
   =========================================
-  BASIC VALIDATION
+  VALIDATION
   =========================================
   */
-
-  if (
-    !start ||
-    !end ||
-    !name ||
-    !email ||
-    !title ||
-    !lockToken ||
-    !idempotencyKey
-  ) {
+  if (!start || !end || !name || !email || !title || !lockToken || !idempotencyKey) {
     return res.status(400).json({
       error: "Missing required fields",
     });
@@ -41,19 +31,18 @@ router.post("/", async (req, res) => {
   const bookingKey = `booking:${idempotencyKey}`;
 
   try {
+    console.log("BOOK REQUEST START:", start);
+    console.log("LOCK KEY:", lockKey);
 
     /*
     =========================================
     1. IDEMPOTENCY CHECK
     =========================================
     */
-
     const existing = await redis.get(bookingKey);
 
     if (existing) {
-      return res.status(200).json(
-        JSON.parse(existing)
-      );
+      return res.status(200).json(JSON.parse(existing));
     }
 
     /*
@@ -61,8 +50,10 @@ router.post("/", async (req, res) => {
     2. VERIFY LOCK
     =========================================
     */
-
     const currentToken = await redis.get(lockKey);
+
+    console.log("REDIS TOKEN:", currentToken);
+    console.log("CLIENT TOKEN:", lockToken);
 
     if (!currentToken || currentToken !== lockToken) {
       return res.status(409).json({
@@ -72,31 +63,37 @@ router.post("/", async (req, res) => {
 
     /*
     =========================================
-    3. FINAL CAL.COM BOOKING
+    3. CAL.COM BOOKING (FIXED v2)
     =========================================
     */
+    const payload = {
+      eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID), // ✅ FIX CRUCIALE
+      start,
+      end,
+      title,
+      timeZone: "Europe/Rome",
+
+      language: "it", // required da Cal.com v2
+      metadata: {},   // required da Cal.com v2
+
+      attendees: [
+        {
+          name,
+          email,
+        },
+      ],
+    };
+
+    console.log("CAL PAYLOAD:", payload);
 
     const { data } = await axios.post(
       "https://api.cal.com/v2/bookings",
-      {
-        eventTypeId: process.env.CAL_EVENT_TYPE_ID,
-        start,
-        end,
-        title,
-        timeZone: "Europe/Rome",
-        attendees: [
-          {
-            name,
-            email,
-          },
-        ],
-      },
+      payload,
       {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
           "Content-Type": "application/json",
         },
-
         timeout: 10000,
       }
     );
@@ -106,7 +103,6 @@ router.post("/", async (req, res) => {
     4. SAVE IDEMPOTENT RESULT
     =========================================
     */
-
     await redis.set(
       bookingKey,
       JSON.stringify(data),
@@ -117,27 +113,21 @@ router.post("/", async (req, res) => {
     return res.status(200).json(data);
 
   } catch (err) {
-
-    console.error(err?.response?.data || err.message);
+    console.error("BOOK ERROR:", err?.response?.data || err.message);
 
     return res.status(500).json({
       error: "Booking failed",
-      details:
-        err?.response?.data ||
-        err.message,
+      details: err?.response?.data || err.message,
     });
 
   } finally {
-
     /*
     =========================================
     5. SAFE LOCK RELEASE
     =========================================
     */
-
     await releaseLock(lockKey, lockToken);
   }
 });
 
 export default router;
-
