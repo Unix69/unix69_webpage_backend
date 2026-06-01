@@ -88,14 +88,7 @@ router.post("/", async (req, res) => {
 
     const response = await axios.post(
       "https://api.cal.com/v2/bookings",
-      {
-        eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
-        start,
-        end,
-        title,
-        timeZone: "Europe/Rome",
-        attendees: [{ name, email }],
-      },
+      payload,
       {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
