@@ -79,8 +79,8 @@ router.post("/", async (req, res) => {
     // 1. Definisci il payload come oggetto puro
     const payload = {
       eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
-      start: start,
-      end: end,
+      start: formattedStart,
+      end: formattedEnd,
       attendee: {
         name: name,
         email: email,
