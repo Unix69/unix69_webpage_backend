@@ -87,6 +87,9 @@ router.post("/", async (req, res) => {
         timeZone: "Europe/Rome",
         language: "it"
       },
+      bookingFieldsResponses: {
+        title: title 
+      },
       metadata: { source: "web-booking" }
     };
 
@@ -104,7 +107,7 @@ router.post("/", async (req, res) => {
       }
     });
 
-    console.log("CAL RESPONSE:", stringify(response.data));
+    console.log("CAL RESPONSE:", JSON.stringify(response.data));
 
     const data = response.data;
 
