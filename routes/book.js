@@ -69,16 +69,30 @@ router.post("/", async (req, res) => {
     const formattedStart = new Date(start).toISOString();
     const formattedEnd = new Date(end).toISOString();
     
+    /*
+    =========================================
+    3. CAL.COM BOOKING (FIXED v2)
+    =========================================
+    */
     const payload = {
+      // Dati obbligatori base
       eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
-      start: formattedStart, // Assicurati che siano stringhe
-      end: formattedEnd,
+      start: formattedStart, // Formato ISO 8601
+      end: formattedEnd,     // Formato ISO 8601
+  
+      // Struttura Attendee richiesta dalla v2
       attendee: {
-          name: name,
-          email: email
+        name: name,
+        email: email,
+        timeZone: "Europe/Rome",
+        language: "it"
       },
-      timeZone: "Europe/Rome",
-      language: "it"
+      
+      // Metadata è obbligatorio come oggetto (anche vuoto)
+      metadata: {}, 
+      
+      // Campi aggiuntivi (opzionali ma utili per la v2)
+      bookingFieldsResponses: {} 
     };
 
     console.log("CAL PAYLOAD:", payload);
