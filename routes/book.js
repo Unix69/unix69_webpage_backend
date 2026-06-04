@@ -75,7 +75,8 @@ router.post("/", async (req, res) => {
           name,
           email,
           timeZone: "Europe/Rome",
-          language: "it"
+          language: "it",
+          note: ""
         }
     };
 
