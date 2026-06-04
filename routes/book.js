@@ -112,6 +112,11 @@ router.post("/", async (req, res) => {
     return res.status(200).json(data);
 
   } catch (err) {
+    
+    if (err?.response?.data?.error?.details?.errors) {
+        console.error("DETTAGLI ERRORI CAL.COM:", JSON.stringify(err.response.data.error.details.errors, null, 2));
+    }
+
     console.error("BOOK ERROR:", err?.response?.data || err.message);
 
     return res.status(500).json({
