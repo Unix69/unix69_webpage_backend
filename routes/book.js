@@ -80,7 +80,7 @@ router.post("/", async (req, res) => {
     const payload = {
       eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
       start: formattedStart,
-      end: formattedEnd,
+      //end: formattedEnd,
       attendee: {
         name: name,
         email: email,
