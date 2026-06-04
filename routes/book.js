@@ -74,42 +74,35 @@ router.post("/", async (req, res) => {
     3. CAL.COM BOOKING (FIXED v2)
     =========================================
     */
+    
+
+    // 1. Definisci il payload come oggetto puro
     const payload = {
-      // 1. Dati obbligatori richiesti dallo schema v2
       eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
       start: start,
-      end: end, // Nota: La v2 calcola spesso la durata da start/end
-      
-      // 2. Attendee (Obbligatorio)
+      end: end,
       attendee: {
         name: name,
-        email: email
+        email: email,
+        timeZone: "Europe/Rome",
+        language: "it"
       },
-      
-      timeZone: "Europe/Rome",
-      language: "it",
-      
-      // 3. Metadata (Obbligatorio come oggetto, anche se vuoto)
-      metadata: {},
-      
-      // 4. Campi aggiuntivi per prevenire errori di validazione "missing field"
-      bookingFieldsResponses: {},
-      location: { type: "online" } // Impostato di default per evitare errori
+      metadata: { source: "web-booking" }
     };
 
-    console.log("CAL PAYLOAD:", payload);
+    console.log("PAYLOAD PRIMA DI AXIOS:", JSON.stringify(payload));
 
-    const response = await axios.post(
-      "https://api.cal.com/v2/bookings",
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.CAL_API_KEY}`,
-          "Content-Type": "application/json",
-          "call-api-version": "2026-02-25"
-        },
+    // 2. Esegui la richiesta in modo esplicito
+    const response = await axios({
+      method: 'post',
+      url: 'https://api.cal.com/v2/bookings',
+      data: payload,
+      headers: {
+        'Authorization': `Bearer ${process.env.CAL_API_KEY}`,
+        'Content-Type': 'application/json',
+        'cal-api-version': '2026-02-25'
       }
-    );
+    });
 
     console.log("CAL RESPONSE:", stringify(response.data));
 
