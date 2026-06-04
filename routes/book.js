@@ -83,10 +83,11 @@ router.post("/", async (req, res) => {
       // 2. Attendee (Obbligatorio)
       attendee: {
         name: name,
-        email: email,
-        timeZone: "Europe/Rome",
-        language: "it"
+        email: email
       },
+      
+      timeZone: "Europe/Rome",
+      language: "it",
       
       // 3. Metadata (Obbligatorio come oggetto, anche se vuoto)
       metadata: {},
