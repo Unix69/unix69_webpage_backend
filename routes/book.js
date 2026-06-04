@@ -66,18 +66,19 @@ router.post("/", async (req, res) => {
     3. CAL.COM BOOKING (FIXED v2)
     =========================================
     */
+    const formattedStart = new Date(start).toISOString();
+    const formattedEnd = new Date(end).toISOString();
+    
     const payload = {
       eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
-      start,
-      end,
-      metadata: {},
+      start: formattedStart, // Assicurati che siano stringhe
+      end: formattedEnd,
       attendee: {
-          name,
-          email,
-          timeZone: "Europe/Rome",
-          language: "it",
-          note: ""
-        }
+          name: name,
+          email: email
+      },
+      timeZone: "Europe/Rome",
+      language: "it"
     };
 
     console.log("CAL PAYLOAD:", payload);
