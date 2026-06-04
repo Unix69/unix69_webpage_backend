@@ -67,21 +67,16 @@ router.post("/", async (req, res) => {
     =========================================
     */
     const payload = {
-      eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID), // ✅ FIX CRUCIALE
+      eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
       start,
       end,
-      title,
-      timeZone: "Europe/Rome",
-
-      language: "it", // required da Cal.com v2
-      metadata: {},   // required da Cal.com v2
-
-      attendees: [
-        {
+      metadata: {},
+      attendee: {
           name,
           email,
-        },
-      ],
+          timeZone: "Europe/Rome",
+          language: "it"
+        }
     };
 
     console.log("CAL PAYLOAD:", payload);
@@ -93,6 +88,7 @@ router.post("/", async (req, res) => {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
           "Content-Type": "application/json",
+          "call-api-version": "2024-08-13"
         },
       }
     );
