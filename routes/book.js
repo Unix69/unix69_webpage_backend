@@ -75,12 +75,12 @@ router.post("/", async (req, res) => {
     =========================================
     */
     const payload = {
-      // Dati obbligatori base
+      // 1. Dati obbligatori richiesti dallo schema v2
       eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
-      start: formattedStart, // Formato ISO 8601
-      end: formattedEnd,     // Formato ISO 8601
-  
-      // Struttura Attendee richiesta dalla v2
+      start: start,
+      end: end, // Nota: La v2 calcola spesso la durata da start/end
+      
+      // 2. Attendee (Obbligatorio)
       attendee: {
         name: name,
         email: email,
@@ -88,11 +88,12 @@ router.post("/", async (req, res) => {
         language: "it"
       },
       
-      // Metadata è obbligatorio come oggetto (anche vuoto)
-      metadata: {}, 
+      // 3. Metadata (Obbligatorio come oggetto, anche se vuoto)
+      metadata: {},
       
-      // Campi aggiuntivi (opzionali ma utili per la v2)
-      bookingFieldsResponses: {} 
+      // 4. Campi aggiuntivi per prevenire errori di validazione "missing field"
+      bookingFieldsResponses: {},
+      location: { type: "online" } // Impostato di default per evitare errori
     };
 
     console.log("CAL PAYLOAD:", payload);
@@ -104,7 +105,7 @@ router.post("/", async (req, res) => {
         headers: {
           Authorization: `Bearer ${process.env.CAL_API_KEY}`,
           "Content-Type": "application/json",
-          "call-api-version": "2024-08-13"
+          "call-api-version": "2026-02-25"
         },
       }
     );
