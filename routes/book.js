@@ -4,27 +4,24 @@ import { releaseLock } from "../lib/lock.js";
 import redis from "../lib/redis.js";
 
 const router = express.Router();
-
 router.post("/", async (req, res) => {
-  const {
-    start,
-    end,
-    name,
-    email,
-    title,
-    lockToken,
-    idempotencyKey,
+  // Ora leggiamo 'type' dal body che arriva dal frontend
+  const { 
+    start, end, name, email, title, lockToken, idempotencyKey, 
+    tutoring_event_id, subject, type
   } = req.body;
 
-  /*
-  =========================================
-  VALIDATION
-  =========================================
-  */
-  if (!start || !end || !name || !email || !title || !lockToken || !idempotencyKey) {
-    return res.status(400).json({
-      error: "Missing required fields",
-    });
+  // 1. Validazione base
+  if (!start || !end || !name || !email || !title || !tutoring_event_id) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  // 2. Recupero ID dinamico dalla configurazione
+  const config = JSON.parse(process.env.CAL_TUTORING_EVENTS);
+  const eventTypeId = config[tutoring_event_id];
+
+  if (!eventTypeId) {
+    return res.status(400).json({ error: "Invalid event type id" });
   }
 
   const lockKey = `lock:cal-slot:${start}`;
@@ -78,7 +75,7 @@ router.post("/", async (req, res) => {
 
     // 1. Definisci il payload come oggetto puro
     const payload = {
-      eventTypeId: Number(process.env.CAL_EVENT_TYPE_ID),
+      eventTypeId: Number(eventTypeId),
       start: formattedStart,
       //end: formattedEnd,
       attendee: {
@@ -88,7 +85,9 @@ router.post("/", async (req, res) => {
         language: "it"
       },
       bookingFieldsResponses: {
-        title: title 
+        title: title,
+        type: type,
+        subject: subject
       },
       metadata: { source: "web-booking" }
     };
