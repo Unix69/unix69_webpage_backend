@@ -16,10 +16,14 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  console.log("DEBUG - Variabile ambiente:", process.env.CAL_TUTORING_EVENTS);
-  // 2. Recupero ID dinamico dalla configurazione
-  const config = JSON.parse(process.env.CAL_TUTORING_EVENTS);
-  const eventTypeId = config[tutoring_event_id];
+  const eventMapping = {
+    "1h-stripe": process.env.CAL_EVENT_1H_STRIPE,
+    "1h-manual": process.env.CAL_EVENT_1H_MANUAL,
+    "2h-stripe": process.env.CAL_EVENT_2H_STRIPE,
+    "2h-manual": process.env.CAL_EVENT_2H_MANUAL,
+  };
+
+  const eventTypeId = eventMapping[tutoring_event_id];
 
   if (!eventTypeId) {
     return res.status(400).json({ error: "Invalid event type id" });
