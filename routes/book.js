@@ -20,6 +20,7 @@ router.post("/", async (req, res) => {
   console.log("DEBUG - Variabile ambiente CAL_EVENT_1H_MANUAL:", process.env.CAL_EVENT_1H_MANUAL);
   console.log("DEBUG - Variabile ambiente CAL_EVENT_2H_STRIPE:", process.env.CAL_EVENT_2H_STRIPE);
   console.log("DEBUG - Variabile ambiente CAL_EVENT_2H_MANUAL:", process.env.CAL_EVENT_2H_MANUAL);
+  console.log("DEBUG - Tutoring Event Id receivded:", tutoring_event_id);
 
   console.log("DEBUG - TUTTE LE VARIABILI:", process.env);
   
