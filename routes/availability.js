@@ -83,6 +83,10 @@ console.log("Redis locks:", keys.length);
       slots: normalizedSlots.filter(slot => !lockedSlots.has(slot.start))
     };
 
+    console.log("Slot totali da Cal.com:", normalizedSlots.length);
+    console.log("Slot bloccati in Redis:", lockedSlots.size);
+    console.log("Slot restituiti al frontend:", filtered.slots.length);
+
     return res.status(200).json(filtered);
 
   } catch (err) {
