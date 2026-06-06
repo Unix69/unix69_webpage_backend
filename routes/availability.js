@@ -72,19 +72,30 @@ router.get("/", async (req, res) => {
 
     } while (cursor !== "0");
 
-console.log("Redis locks:", keys.length);
+    
+
+    console.log("Redis keys trovate:", keys); // Vediamo cosa restituisce effettivamente Redis
 
     const lockedSlots = new Set(
       keys.map(k => k.replace("lock:cal-slot:", ""))
     );
+    
+    console.log("Set dei lock (pulito):", Array.from(lockedSlots));
+
+    const filteredSlots = normalizedSlots.filter(slot => {
+      const isLocked = lockedSlots.has(slot.start);
+      if (isLocked) {
+        console.log("MATCH TROVATO! Slot bloccato:", slot.start);
+      }
+      return !isLocked;
+    });
 
     const filtered = {
       status: "success",
-      slots: normalizedSlots.filter(slot => !lockedSlots.has(slot.start))
+      slots: filteredSlots
     };
 
     console.log("Slot totali da Cal.com:", normalizedSlots.length);
-    console.log("Slot bloccati in Redis:", lockedSlots.size);
     console.log("Slot restituiti al frontend:", filtered.slots.length);
 
     return res.status(200).json(filtered);
