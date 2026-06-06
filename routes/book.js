@@ -16,6 +16,11 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  console.log("DEBUG - Variabile ambiente CAL_EVENT_1H_STRIPE:", process.env.CAL_EVENT_1H_STRIPE);
+  console.log("DEBUG - Variabile ambiente CAL_EVENT_1H_MANUAL:", process.env.CAL_EVENT_1H_MANUAL);
+  console.log("DEBUG - Variabile ambiente CAL_EVENT_2H_STRIPE:", process.env.CAL_EVENT_2H_STRIPE);
+  console.log("DEBUG - Variabile ambiente CAL_EVENT_2H_MANUAL:", process.env.CAL_EVENT_2H_MANUAL);
+
   const eventMapping = {
     "1h-stripe": process.env.CAL_EVENT_1H_STRIPE,
     "1h-manual": process.env.CAL_EVENT_1H_MANUAL,
