@@ -6,29 +6,29 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    if (!process.env.CAL_API_KEY || !process.env.CAL_EVENT_TYPE_ID) {
-      return res.status(500).json({
-        error: "Missing env variables",
+    const { data } = await axios.get("https://api.cal.com/v2/slots", {
+      headers: { Authorization: `Bearer ${process.env.CAL_API_KEY}`, "cal-api-version": "2024-09-04" },
+      params: {
+        eventTypeId: process.env.CAL_EVENT_TYPE_ID,
+        start: new Date().toISOString(),
+        end: new Date(Date.now() + 7 * 86400000).toISOString(),
+      },
+    });
+
+    // 1. TRASFORMAZIONE: Converti l'oggetto data (date come chiavi) in un array piatto di slot
+    let flatSlots = [];
+    if (data?.data) {
+      Object.values(data.data).forEach(daySlots => {
+        flatSlots.push(...daySlots);
       });
     }
 
-    const { data } = await axios.get(
-      "https://api.cal.com/v2/slots",
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.CAL_API_KEY}`,
-          "cal-api-version": "2024-09-04",
-        },
-        params: {
-          eventTypeId: process.env.CAL_EVENT_TYPE_ID,
-          start: new Date().toISOString(),
-          end: new Date(Date.now() + 7 * 86400000).toISOString(),
-        },
-      }
-    );
-
-    // SAFE SLOTS
-    const slots = data?.slots || [];
+    // 2. Assicuriamoci che ogni slot abbia 'start' e 'end' 
+    // (Cal.com v2 a volte manda solo lo start, se manca l'end lo calcoliamo noi)
+    const normalizedSlots = flatSlots.map(s => ({
+      start: s.start,
+      end: s.end || new Date(new Date(s.start).getTime() + 3600000).toISOString() // default 1h
+    }));
 
     // SAFE REDIS SCAN (NO KEYS)
     let cursor = "0";
@@ -71,16 +71,14 @@ console.log("Redis locks:", keys.length);
     );
 
     const filtered = {
-      ...data,
-      slots: slots.filter(slot => {
-        return !lockedSlots.has(slot.start);
-      }),
+      status: "success",
+      slots: normalizedSlots.filter(slot => !lockedSlots.has(slot.start))
     };
 
     return res.status(200).json(filtered);
 
   } catch (err) {
-    console.error("🔥 AVAILABILITY ERROR FULL:");
+    console.error("AVAILABILITY ERROR FULL:");
     console.error("STATUS:", err?.response?.status);
     console.error("DATA:", err?.response?.data);
     console.error("MESSAGE:", err.message);
