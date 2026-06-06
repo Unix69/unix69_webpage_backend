@@ -77,7 +77,12 @@ router.get("/", async (req, res) => {
     console.log("Redis keys trovate:", keys); // Vediamo cosa restituisce effettivamente Redis
 
     const lockedSlots = new Set(
-      keys.map(k => k.replace("lock:cal-slot:", ""))
+      keys.map(k => {
+        // 1. Rimuove il prefisso
+        let clean = k.replace("lock:cal-slot:", "");
+        // 2. Rimuove eventuali virgolette extra (inizio e fine)
+        return clean.replace(/^"|"$/g, '');
+      })
     );
     
     console.log("Set dei lock (pulito):", Array.from(lockedSlots));
