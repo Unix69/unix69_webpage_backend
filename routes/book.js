@@ -16,6 +16,7 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  console.log("DEBUG - Variabile ambiente:", process.env.CAL_TUTORING_EVENTS);
   // 2. Recupero ID dinamico dalla configurazione
   const config = JSON.parse(process.env.CAL_TUTORING_EVENTS);
   const eventTypeId = config[tutoring_event_id];
