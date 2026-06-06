@@ -5,7 +5,9 @@ import redis  from "../lib/redis.js";
 const router = express.Router();
 
 router.get("/", async (req, res) => {
+
   const { start, end } = req.query;
+  console.log("PARAMETRI RICEVUTI:", req.query);
 
   if (!start || !end) {
     return res.status(400).json({ error: "Missing start or end date" });
